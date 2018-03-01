@@ -19,6 +19,8 @@ public class CEmpleado implements Parcelable {
         this.oficio = oficio;
     }
 
+    public CEmpleado() {
+    }
 
     public static final Creator <CEmpleado> CREATOR = new Creator <CEmpleado>() {
         @Override

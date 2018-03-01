@@ -7,11 +7,18 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 public class nuevoempleadoactivity extends AppCompatActivity {
     static final String EXTRA_EMPLEADO="Empleado";
 
 
     EditText ednombre,eddni,editoficio;
+    private DatabaseReference dbRef;
+    private ValueEventListener valueEventListener;
 
 
     @Override
@@ -50,26 +57,77 @@ public class nuevoempleadoactivity extends AppCompatActivity {
         String oficio = editoficio.getText().toString();
 
 
-        if (nombre.equals("") || dni.equals("") || oficio.equals("")) {
-            Toast.makeText(getApplicationContext(), "Rellena todos los campos", Toast.LENGTH_LONG).show();
-        } else {
+        if(nombre.equals("")||dni.equals("")||oficio.equals("")){
+            Toast.makeText(getApplicationContext(),"Rellena todos los campos",Toast.LENGTH_LONG).show();
+        }else{
 
-            //Crear el objeto libro con los valores del formulario
-            CEmpleado e = new CEmpleado(nombre, dni, oficio);
-            //Creamos el objeto intent para preparar el envio de datos.
+            CEmpleado nuevoEmpleado=new CEmpleado(nombre,dni,oficio);
+            dbRef = FirebaseDatabase.getInstance().getReference()
+                    .child("Empleados");
 
-            Intent i = new Intent(getApplicationContext(),MainActivity.class);
-            //envimaos los extras con i.putextra
-
-            i.putExtra(EXTRA_EMPLEADO, e);
-
-            startActivity(i);
-
+            //String nueva_clave = dbRef.push().setValue(nuevoJugador, new DatabaseReference.CompletionListener(){
+            String valoresnuevoEmpleado = nuevoEmpleado.getClass().toString();
+            dbRef.child(valoresnuevoEmpleado).setValue(nuevoEmpleado, new DatabaseReference.CompletionListener(){
+                public void onComplete(DatabaseError error, DatabaseReference ref) {
+                    if(error == null) {
+                        Toast.makeText(getApplicationContext(),
+                                "INSERTADO CORRECTAMENTE",
+                                Toast.LENGTH_LONG).show();
+                        //limpiarFormulario();
+                    }else {
+                        Toast.makeText(getApplicationContext(),
+                                "NO SE PUEDE INSETAR EL JUGADOR",
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
 
         }
     }
 
-    public void modificar (View v){}
+
+
+    public void modificar (View v){
+
+
+        String nombre = ednombre.getText().toString();
+        String dni = eddni.getText().toString();
+        String oficio = editoficio.getText().toString();
+
+
+        if (nombre.equals("")  || dni.equals("") || oficio.equals("")) {
+            Toast.makeText(getApplicationContext(), "Rellena todos los campos", Toast.LENGTH_LONG).show();
+        } else {
+
+            CEmpleado nuevoJugador = new CEmpleado(nombre,dni,oficio);
+            dbRef = FirebaseDatabase.getInstance().getReference()
+                    .child("Empleados");
+
+
+            //String nueva_clave = dbRef.push().setValue(nuevoJugador, new DatabaseReference.CompletionListener(){
+            String valoresañadidos= nuevoJugador.class;
+            dbRef.child(valoresañadidos).setValue(nuevoJugador, new DatabaseReference.CompletionListener() {
+
+                public void onComplete(DatabaseError error, DatabaseReference ref) {
+                    if (error == null) {
+
+                        Toast.makeText(getApplicationContext(),
+                                "MODIFICADO CORRECTAMENTE",
+                                Toast.LENGTH_LONG).show();
+
+                        //limpiarFormulario();
+                    } else {
+                        Toast.makeText(getApplicationContext(),
+                                "NO SE PUEDE MODIFICAR EL JUGADOR",
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+
+        }
+
+
+
 
 
 
